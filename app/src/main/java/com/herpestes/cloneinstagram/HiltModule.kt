@@ -10,10 +10,10 @@ import com.google.firebase.storage.ktx.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.processor.internal.definecomponent.codegen._dagger_hilt_android_components_ViewModelComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(_dagger_hilt_android_components_ViewModelComponent::class)
+@InstallIn(ViewModelComponent::class)
 class HiltModule {
     @Provides
     fun provideAuthnetication(): FirebaseAuth = Firebase.auth
