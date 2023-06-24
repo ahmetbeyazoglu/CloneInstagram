@@ -10,8 +10,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.herpestes.cloneinstagram.ui.theme.CloneInstagramTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,22 +26,23 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    InstagramApp()
                 }
             }
         }
     }
 }
-
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun InstagramApp(){
+    val vm = hiltViewModel<IgViewModel>()
+    val i = 0
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     CloneInstagramTheme {
-        Greeting("Android")
+        InstagramApp()
     }
 }
