@@ -76,7 +76,13 @@ fun SingupScreen(navController: NavController, vm: IgViewModel) {
             )
 
             Button(
-                onClick = { },
+                onClick = {
+                          vm.onSignup(
+                              usernameState.value.text,
+                              emailState.value.text ,
+                              passState.value.text
+                          )
+                },
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(text = "SIGN UP")
