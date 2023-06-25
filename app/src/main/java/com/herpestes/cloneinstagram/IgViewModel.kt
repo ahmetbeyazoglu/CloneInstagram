@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.herpestes.cloneinstagram.data.Event
 import com.herpestes.cloneinstagram.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -22,6 +23,7 @@ class IgViewModel @Inject constructor(
     val signedIn = mutableStateOf(false)
     val inProgress = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
+    val popupNotification = mutableStateOf<Event<String>?>(null)
     fun onSignup(username: String, email: String, pass: String){
         inProgress.value = true
 
@@ -47,7 +49,12 @@ class IgViewModel @Inject constructor(
             .addOnFailureListener {  }
     }
 
-    fun handleException(exception: Exception? = null, customMessage: String? = ""){
+    fun handleException(exception: Exception? = null, customMessage: String = ""){
+
+        exception?.printStackTrace()
+        val errorMsg = exception?.localizedMessage ?: ""
+        val message = if(customMessage.isEmpty()) errorMsg else "$customMessage: $errorMsg"
+        popupNotification.value = Event(message)
 
     }
 
