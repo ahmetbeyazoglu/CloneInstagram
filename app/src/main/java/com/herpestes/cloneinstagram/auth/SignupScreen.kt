@@ -23,8 +23,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.herpestes.cloneinstagram.DestinationScreen
 import com.herpestes.cloneinstagram.IgViewModel
 import com.herpestes.cloneinstagram.main.CommonProgressSpinner
+import com.herpestes.cloneinstagram.main.navigateTo
 
 @Composable
 fun SingupScreen(navController: NavController, vm: IgViewModel) {
@@ -92,7 +94,9 @@ fun SingupScreen(navController: NavController, vm: IgViewModel) {
                 color = Color.Blue,
                 modifier = Modifier
                     .padding(8.dp)
-                    .clickable { }
+                    .clickable {
+                        navigateTo(navController, DestinationScreen.Login)
+                    }
             )
         }
 
