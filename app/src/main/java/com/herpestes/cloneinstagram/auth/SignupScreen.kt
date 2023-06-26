@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.herpestes.cloneinstagram.IgViewModel
+import com.herpestes.cloneinstagram.main.CommonProgressSpinner
 
 @Composable
 fun SingupScreen(navController: NavController, vm: IgViewModel) {
@@ -93,8 +94,12 @@ fun SingupScreen(navController: NavController, vm: IgViewModel) {
                     .padding(8.dp)
                     .clickable { }
             )
-
-
         }
+
+        val isLoading = vm.inProgress.value
+        if(isLoading){
+            CommonProgressSpinner()
+        }
+
     }
 }
