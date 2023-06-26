@@ -28,6 +28,7 @@ class IgViewModel @Inject constructor(
     val popupNotification = mutableStateOf<Event<String>?>(null)
 
     init {
+        auth.signOut()
         val currentUser = auth.currentUser
         signedIn.value = currentUser != null
         currentUser?.uid?.let { uid ->
@@ -35,6 +36,12 @@ class IgViewModel @Inject constructor(
         }
     }
     fun onSignup(username: String, email: String, pass: String) {
+
+        if(username.isEmpty() or email.isEmpty() or pass.isEmpty()){
+            handleException(customMessage = "Please filling in all fields")
+            return
+        }
+
         inProgress.value = true
 
         db.collection(USERS).whereEqualTo("username", username).get()
@@ -100,8 +107,37 @@ class IgViewModel @Inject constructor(
                 }
         }
 
+    }
+
+    fun onLogin(email: String, pass: String){
+        if(email.isEmpty() or pass.isEmpty()){
+            handleException(customMessage = "Please filling in all fields")
+            return
+        }
+        inProgress.value = true
+        auth.signInWithEmailAndPassword(email,pass)
+            .addOnCompleteListener {task ->
+                if(task.isSuccessful){
+                    signedIn.value = true
+                    inProgress.value = false
+                    auth.currentUser?.uid?.let { uid ->
+                        handleException(customMessage = "Login Success")
+                        getUserData(uid)
+
+                    }
+                }else{
+                    handleException(task.exception, "Login failed")
+                    inProgress.value = false
+                }
+            }
+            .addOnFailureListener {   exc ->
+                handleException(exc, "Login failed")
+                inProgress.value = false
+            }
 
     }
+
+
     private fun getUserData(uid: String){
 
         inProgress.value = true
@@ -117,6 +153,9 @@ class IgViewModel @Inject constructor(
             }
 
     }
+
+
+
     fun handleException(exception: Exception? = null, customMessage: String = "") {
 
         exception?.printStackTrace()
