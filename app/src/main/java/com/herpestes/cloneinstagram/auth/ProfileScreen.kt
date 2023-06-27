@@ -1,10 +1,15 @@
 package com.herpestes.cloneinstagram.auth
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -18,9 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.android.gms.common.internal.service.Common
 import com.herpestes.cloneinstagram.DestinationScreen
 import com.herpestes.cloneinstagram.IgViewModel
 import com.herpestes.cloneinstagram.main.CommonDivider
+import com.herpestes.cloneinstagram.main.CommonImage
 import com.herpestes.cloneinstagram.main.CommonProgressSpinner
 import com.herpestes.cloneinstagram.main.navigateTo
 
@@ -45,7 +52,10 @@ fun ProfileScreen(navController: NavController, vm: IgViewModel) {
             onBioChange = { bio = it },
             onSave = { vm.updateProfileData(name, username, bio) },
             onBack = { navigateTo(navController = navController, DestinationScreen.MyPosts) },
-            onLogout = { }
+            onLogout = {
+                vm.onLogout()
+                navigateTo(navController, DestinationScreen.Login)
+            }
         )
     }
 
@@ -66,6 +76,7 @@ fun ProfileContent(
 
 ) {
     val scrollState = rememberScrollState()
+    val imageUri = vm.userData?.value?.imageUrl
 
     Column(
         modifier = Modifier
@@ -84,14 +95,8 @@ fun ProfileContent(
 
         CommonDivider()
 
-        // user image
-        Column(
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxWidth()
-                .background(Color.Gray)
-        ) {
-        }
+        ProfileImage(imageUrl = imageUri, vm = vm)
+
         CommonDivider()
         Row(
             modifier = Modifier
@@ -156,3 +161,53 @@ fun ProfileContent(
         }
     }
 }
+
+@Composable
+fun ProfileImage(imageUrl: String?, vm: IgViewModel) {
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+
+        uri?.let { vm.uploadProfilemage(uri) }
+
+    }
+
+    Box(modifier = Modifier.height(IntrinsicSize.Min)) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clickable { launcher.launch("image/*") },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                shape = CircleShape, modifier = Modifier
+                    .padding(8.dp)
+                    .size(100.dp)
+            ) {
+                CommonImage(data = imageUrl)
+            }
+            Text(text = "Change profile picture")
+
+        }
+        val isLoading = vm.inProgress.value
+        if (isLoading)
+            CommonProgressSpinner()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

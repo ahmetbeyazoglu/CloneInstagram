@@ -1,5 +1,6 @@
 package com.herpestes.cloneinstagram
 
+import android.net.Uri
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.herpestes.cloneinstagram.data.Event
 import com.herpestes.cloneinstagram.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import javax.inject.Inject
 
 const val USERS = "users"
@@ -167,6 +169,35 @@ class IgViewModel @Inject constructor(
 
     fun updateProfileData(name: String, username: String, bio: String){
         createOrUpdateProfile(name, username, bio)
+    }
+
+    private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit){
+        inProgress.value = true
+        val storageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef = storageRef.child("images/$uuid")
+        val uploadTask = imageRef.putFile(uri)
+
+        uploadTask.addOnSuccessListener {
+            val result = it.metadata?.reference?.downloadUrl
+            result?.addOnSuccessListener  (onSuccess)
+        }
+            .addOnFailureListener { exc ->
+                handleException(exc)
+                    inProgress.value = false
+            }
+    }
+    fun uploadProfilemage(uri: Uri){
+        uploadImage(uri){
+            createOrUpdateProfile(imageUrl = it.toString())
+        }
+    }
+
+    fun onLogout(){
+        auth.signOut()
+        signedIn.value = false
+        userData.value = null
+        popupNotification.value = Event("Logged out")
     }
 
 
