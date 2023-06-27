@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.herpestes.cloneinstagram.DestinationScreen
 import com.herpestes.cloneinstagram.IgViewModel
 
 @Composable
@@ -61,7 +62,8 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                 Text(text = userData?.bio ?: "")
             }
             OutlinedButton(
-                onClick = { }, modifier = Modifier
+                onClick = { navigateTo(navController, DestinationScreen.Profile) },
+                modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),

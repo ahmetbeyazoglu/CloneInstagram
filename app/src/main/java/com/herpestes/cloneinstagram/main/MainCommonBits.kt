@@ -113,10 +113,18 @@ fun UserImageCard(
         }else{
             CommonImage(data = userImage)
         }
-
     }
+}
 
-
+@Composable
+fun CommonDivider(){
+    Divider(
+        color = Color.LightGray,
+        thickness = 1.dp,
+        modifier = Modifier
+            .alpha(0.3f)
+            .padding(top = 8.dp, bottom = 8.dp)
+    )
 }
 
 
