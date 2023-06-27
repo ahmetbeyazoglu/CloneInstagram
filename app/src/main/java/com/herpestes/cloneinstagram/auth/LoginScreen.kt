@@ -25,10 +25,13 @@ import androidx.navigation.NavController
 import com.herpestes.cloneinstagram.DestinationScreen
 import com.herpestes.cloneinstagram.IgViewModel
 import com.herpestes.cloneinstagram.main.CommonProgressSpinner
+import com.herpestes.cloneinstagram.main.checkSignedIn
 import com.herpestes.cloneinstagram.main.navigateTo
 
 @Composable
 fun loginScreen(navController: NavController, vm: IgViewModel) {
+    
+    checkSignedIn(vm = vm, navController = navController)
 
     val focus = LocalFocusManager.current
 
