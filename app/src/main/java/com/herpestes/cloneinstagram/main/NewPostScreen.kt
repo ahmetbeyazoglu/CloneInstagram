@@ -47,13 +47,13 @@ fun NewPostScreen(navController: NavController, vm: IgViewModel, encodedUri: Str
                 .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-           /* Text(text = "Cancel", modifier = Modifier.clickable { navController.popBackStack() })
+            Text(text = "Cancel", modifier = Modifier.clickable { navController.popBackStack() })
             Text(text = "Post", modifier = Modifier.clickable {
                 focusManager.clearFocus()
                 vm.onNewPost(Uri.parse(imageUri), description) { navController.popBackStack() }
 
 
-            })*/
+            })
         }
 
         CommonDivider()

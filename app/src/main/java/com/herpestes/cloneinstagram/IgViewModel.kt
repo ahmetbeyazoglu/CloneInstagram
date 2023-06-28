@@ -11,11 +11,13 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.herpestes.cloneinstagram.data.Event
 import com.herpestes.cloneinstagram.data.UserData
+import com.herpestes.cloneinstagram.main.PostData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.UUID
 import javax.inject.Inject
 
 const val USERS = "users"
+const val POSTS = "posts"
 
 @HiltViewModel
 class IgViewModel @Inject constructor(
@@ -200,5 +202,46 @@ class IgViewModel @Inject constructor(
         popupNotification.value = Event("Logged out")
     }
 
+    fun onNewPost(uri: Uri, descripton: String, onPostSuccess: () -> Unit){
+        uploadImage(uri){
+            onCreatePost(it, descripton, onPostSuccess)
+        }
+    }
+    private fun onCreatePost(imageUri: Uri, descripton: String, onPostSuccess: () -> Unit){
+        inProgress.value = true
+        val currentUid = auth.currentUser?.uid
+        val currentUsername = userData.value?.username
+        val currentUserImage = userData.value?.imageUrl
+
+        if(currentUid != null){
+
+            val postUuid = UUID.randomUUID().toString()
+            val post = PostData(
+                postId = postUuid,
+                userId = currentUid,
+                username = currentUsername,
+                userImage = currentUserImage,
+                postImage = imageUri.toString(),
+                postDescription = descripton,
+                time = System.currentTimeMillis(),
+            )
+            db.collection(POSTS).document(postUuid).set(post)
+                .addOnSuccessListener {
+                    popupNotification.value = Event("Post succesfuly created")
+                    inProgress.value = false
+                    onPostSuccess.invoke()
+                }
+                .addOnFailureListener { exc ->
+                        handleException(exc, "Unable to create post")
+                        inProgress.value = false
+                }
+
+        }else{
+            handleException(customMessage = "Error: username unavailable, Unable to create post")
+            onLogout()
+            inProgress.value = false
+        }
+
+    }
 
 }
