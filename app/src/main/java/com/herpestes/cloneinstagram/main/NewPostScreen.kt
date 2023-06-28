@@ -27,6 +27,7 @@ import com.herpestes.cloneinstagram.main.CommonDivider
 import com.herpestes.cloneinstagram.main.CommonProgressSpinner
 
 
+
 @Composable
 fun NewPostScreen(navController: NavController, vm: IgViewModel, encodedUri: String) {
 
