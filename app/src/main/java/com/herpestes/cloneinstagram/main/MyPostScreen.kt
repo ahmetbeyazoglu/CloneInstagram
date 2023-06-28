@@ -122,8 +122,12 @@ fun MyPostScreen(navController: NavController, vm: IgViewModel) {
                     .padding(1.dp)
                     .fillMaxSize(),
 
-                ) {
-                // On post Click
+                ) { post ->
+                navigateTo(
+                    navController = navController,
+                    DestinationScreen.SinglePost,
+                    NavParam("post", post)
+                )
             }
         }
         BottomNavigationMenu(

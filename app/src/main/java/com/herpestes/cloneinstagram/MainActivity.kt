@@ -41,54 +41,69 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-sealed class DestinationScreen(val route: String){
-    object Signup: DestinationScreen("signup")
-    object Login: DestinationScreen("Login")
-    object Feed: DestinationScreen("feed")
-    object Search: DestinationScreen("search")
-    object MyPosts: DestinationScreen("myposts")
-    object Profile: DestinationScreen("profile")
-    object NewPost: DestinationScreen("newpost/{imageUri}")
+sealed class DestinationScreen(val route: String) {
+    object Signup : DestinationScreen("signup")
+    object Login : DestinationScreen("Login")
+    object Feed : DestinationScreen("feed")
+    object Search : DestinationScreen("search")
+    object MyPosts : DestinationScreen("myposts")
+    object Profile : DestinationScreen("profile")
+    object NewPost : DestinationScreen("newpost/{imageUri}") {
         fun createRoute(uri: String) = "newpost/$uri"
+    }
+
+    object SinglePost : DestinationScreen("singlepost")
 }
 
 @Composable
-fun InstagramApp(){
+fun InstagramApp() {
     val vm = hiltViewModel<IgViewModel>()
     val navController = rememberNavController()
-    
+
     NotificationMessage(vm = vm)
 
 
-    NavHost(navController = navController, startDestination = DestinationScreen.Signup.route){
-        composable(DestinationScreen.Signup.route){
-            SingupScreen(navController= navController, vm =vm)
+    NavHost(navController = navController, startDestination = DestinationScreen.Signup.route) {
+        composable(DestinationScreen.Signup.route) {
+            SingupScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.Login.route){
-            loginScreen(navController = navController, vm = vm )
+        composable(DestinationScreen.Login.route) {
+            loginScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.Feed.route){
+        composable(DestinationScreen.Feed.route) {
             FeedScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.Search.route){
+        composable(DestinationScreen.Search.route) {
             SearchScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.MyPosts.route){
+        composable(DestinationScreen.MyPosts.route) {
             MyPostScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.Profile.route){
+        composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController = navController, vm = vm)
         }
-        composable(DestinationScreen.NewPost.route){ navBackStackEntry ->
+        composable(DestinationScreen.NewPost.route) { navBackStackEntry ->
 
             val imageUri = navBackStackEntry.arguments?.getString("imageUri")
             imageUri?.let {
                 NewPostScreen(navController = navController, vm = vm, encodedUri = it)
             }
         }
+        composable(DestinationScreen.SinglePost.route) {
+            val postData = navController
+                .previousBackStackEntry
+                ?.arguments
+                ?.getParcelable<PostData>("post")
+            postData?.let {
+                SinglePostScreen(
+                    navController = navController,
+                    vm = vm,
+                    post = postData
+                )
+            }
+        }
     }
 }
-
 
 
 @Preview(showBackground = true)
