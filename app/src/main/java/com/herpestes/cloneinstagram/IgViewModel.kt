@@ -2,7 +2,6 @@ package com.herpestes.cloneinstagram
 
 import android.net.Uri
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -10,7 +9,6 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.herpestes.cloneinstagram.data.CommentData
 import com.herpestes.cloneinstagram.data.Event
@@ -46,6 +44,8 @@ class IgViewModel @Inject constructor(
 
     val comments = mutableStateOf<List<CommentData>>(listOf())
     val commentsProgress = mutableStateOf(false)
+
+    val followers = mutableStateOf(0)
 
     init {
        // auth.signOut()
@@ -168,6 +168,7 @@ class IgViewModel @Inject constructor(
                 inProgress.value = false
                 refreshPosts()
                 getPersonalizedFeed()
+                getFollowers(user?.userId)
             }
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve user data")
@@ -459,6 +460,12 @@ class IgViewModel @Inject constructor(
             .addOnFailureListener { exc ->
                 handleException(exc, "Cannot retrieve comments")
                 commentsProgress.value = false
+            }
+    }
+    private fun getFollowers(uid: String?){
+        db.collection(USERS).whereArrayContains("following", uid?:"").get()
+            .addOnSuccessListener { document ->
+                followers.value = document.size()
             }
     }
 }
