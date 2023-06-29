@@ -53,6 +53,11 @@ sealed class DestinationScreen(val route: String) {
     }
 
     object SinglePost : DestinationScreen("singlepost")
+    object CommentsScreen: DestinationScreen("comments/{postId}"){
+        fun createRoute(postId: String) = "comments/$postId"
+    }
+
+
 }
 
 @Composable
@@ -101,6 +106,10 @@ fun InstagramApp() {
                     post = postData
                 )
             }
+        }
+        composable(DestinationScreen.CommentsScreen.route){ navBackStackEntry ->
+            val postId = navBackStackEntry.arguments?.getString("postId")
+            postId?.let { CommentsScreen(navController = navController, vm = vm, postId = it) }
         }
     }
 }

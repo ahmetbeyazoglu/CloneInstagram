@@ -12,6 +12,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.herpestes.cloneinstagram.data.CommentData
 import com.herpestes.cloneinstagram.data.Event
 import com.herpestes.cloneinstagram.data.UserData
 import com.herpestes.cloneinstagram.main.PostData
@@ -21,7 +22,7 @@ import javax.inject.Inject
 
 const val USERS = "users"
 const val POSTS = "posts"
-
+const val COMMENTS = "comments"
 @HiltViewModel
 class IgViewModel @Inject constructor(
     val auth: FirebaseAuth,
@@ -42,6 +43,9 @@ class IgViewModel @Inject constructor(
 
     val postsFeed = mutableStateOf<List<PostData>>(listOf())
     val postsFeedProgress = mutableStateOf(false)
+
+    val comments = mutableStateOf<List<CommentData>>(listOf())
+    val commentsProgress = mutableStateOf(false)
 
     init {
        // auth.signOut()
@@ -242,6 +246,7 @@ class IgViewModel @Inject constructor(
         popupNotification.value = Event("Logged out")
         searchedPosts.value = listOf()
         postsFeed.value = listOf()
+        comments.value = listOf()
     }
 
     fun onNewPost(uri: Uri, descripton: String, onPostSuccess: () -> Unit){
@@ -418,6 +423,43 @@ class IgViewModel @Inject constructor(
                 }
             }
         }
+    }
+    fun createComment(postId: String, text: String){
+        userData.value?.username?.let { username ->
+        val commentId = UUID.randomUUID().toString()
+        val comment = CommentData(
+            commentId = commentId,
+            postId = postId,
+            username= username,
+            text = text,
+            timestamp = System.currentTimeMillis()
+            )
+            db.collection(COMMENTS).document(commentId).set(comment)
+                .addOnSuccessListener {
+                    getComments(postId)
+                }
+                .addOnFailureListener {  exc ->
+                    handleException(exc, "Cannot create comment.")
+                }
+        }
+    }
+    fun getComments(postId: String?) {
+        commentsProgress.value = true
+        db.collection(COMMENTS).whereEqualTo("postId", postId).get()
+            .addOnSuccessListener { documents ->
+                val newComments = mutableListOf<CommentData>()
+                documents.forEach { doc ->
+                    val comment = doc.toObject<CommentData>()
+                    newComments.add(comment)
+                }
+                val sortedComments = newComments.sortedByDescending { it.timestamp }
+                comments.value = sortedComments
+                commentsProgress.value = false
+            }
+            .addOnFailureListener { exc ->
+                handleException(exc, "Cannot retrieve comments")
+                commentsProgress.value = false
+            }
     }
 }
 
