@@ -64,7 +64,7 @@ data class NavParam(
 )
 
 fun navigateTo(navController: NavController, dest: DestinationScreen, vararg params: NavParam) {
-    for(param in params){
+    for (param in params) {
         navController.currentBackStackEntry?.arguments?.putParcelable(param.name, param.value)
     }
     navController.navigate(dest.route) {
@@ -79,7 +79,7 @@ fun checkSignedIn(vm: IgViewModel, navController: NavController) {
     val signedIn = vm.signedIn.value
     if (signedIn && !alreadyLoggedIn.value) {
         alreadyLoggedIn.value = true
-        navController.navigate(DestinationScreen.MyPosts.route) {
+        navController.navigate(DestinationScreen.Feed.route) {
             popUpTo(0)
 
         }
@@ -119,14 +119,14 @@ fun UserImageCard(
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color.Gray)
             )
-        }else{
+        } else {
             CommonImage(data = userImage)
         }
     }
 }
 
 @Composable
-fun CommonDivider(){
+fun CommonDivider() {
     Divider(
         color = Color.LightGray,
         thickness = 1.dp,
@@ -136,7 +136,35 @@ fun CommonDivider(){
     )
 }
 
+private enum class LikeIconSize {
+    SMALL,
+    LARGE
+}
 
+@Composable
+fun LikeAnimation(like: Boolean = true) {
+    var sizeState by remember { mutableStateOf(LikeIconSize.SMALL) }
+    val transition = updateTransition(targetState = sizeState, label = "")
+    val size by transition.animateDp(label = "", transitionSpec = {
+        spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    }) { state ->
+        when (state) {
+            LikeIconSize.SMALL -> 0.dp
+            LikeIconSize.LARGE -> 150.dp
+        }
+    }
+    Image(
+        painter = painterResource(id = if (like) R.drawable.ic_like else R.drawable.ic_dislike),
+        contentDescription = null,
+        modifier = Modifier.size(size = size),
+        colorFilter = ColorFilter.tint(if (like) Color.Red else Color.Gray)
+    )
+    sizeState = LikeIconSize.LARGE
+
+}
 
 
 
