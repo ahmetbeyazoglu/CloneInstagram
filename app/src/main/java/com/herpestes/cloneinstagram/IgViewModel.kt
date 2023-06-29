@@ -250,6 +250,13 @@ class IgViewModel @Inject constructor(
         if(currentUid != null){
 
             val postUuid = UUID.randomUUID().toString()
+
+            val fillerWords = listOf("the", "be", "to", "is", "of", "and", "or", "a", "in","it")
+            val searchTerms = descripton
+                .split(" ", ".", ",","?","!","#")
+                .map { it.lowercase() }
+                .filter { it.isNotEmpty() and !fillerWords.contains(it) }
+
             val post = PostData(
                 postId = postUuid,
                 userId = currentUid,
@@ -258,7 +265,8 @@ class IgViewModel @Inject constructor(
                 postImage = imageUri.toString(),
                 postDescription = descripton,
                 time = System.currentTimeMillis(),
-                likes = listOf<String>()
+                likes = listOf<String>(),
+                searchTerms = searchTerms
             )
             db.collection(POSTS).document(postUuid).set(post)
                 .addOnSuccessListener {
